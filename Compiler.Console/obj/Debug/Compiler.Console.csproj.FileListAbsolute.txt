@@ -1,0 +1,1 @@
+D:\Tarek\Training_Projects\Compiler\Compiler.Console\bin\Debug\Compiler.Console.exe.config
