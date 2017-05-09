@@ -18,5 +18,6 @@ namespace Compiler.Lib.Types
         CloseBrace = 7,
         VarSeperator = 8,
         StatementSeperator = 9,
+        Skip = 10
     }
 }

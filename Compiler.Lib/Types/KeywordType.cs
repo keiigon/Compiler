@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Compiler.Lib.Types
 {
-    enum KeywordType
+    public enum KeywordType
     {
         Begin,
         End,

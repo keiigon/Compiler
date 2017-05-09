@@ -27,6 +27,47 @@ namespace Compiler.Lib
 
             var builder = new StringBuilder();
 
+            while (!eof())
+            {
+                skip(CharType.Skip);
+                switch (lookNextCharType())
+                {
+                    case CharType.Alpha: //start of identifier
+                        readToken(builder, CharType.Alpha);
+                        string s = builder.ToString();
+                        if (KeywordToken.IsKeyword(s))
+                            tokens.Add(new KeywordToken(s));
+                        else
+                            tokens.Add(new IdentifierToken(s));
+                        builder.Clear();
+                        break;
+                    case CharType.Numeric: //start of number literal
+                        readToken(builder, CharType.Numeric);
+                        tokens.Add(new NumberLiteralToken(builder.ToString()));
+                        builder.Clear();
+                        break;
+                    case CharType.Operator:
+                        readToken(builder, CharType.Operator);
+                        tokens.Add(new OperatorToken(builder.ToString()));
+                        builder.Clear();
+                        break;
+                    case CharType.OpenBrace:
+                        tokens.Add(new OpenBraceToken(getNextChar().ToString()));
+                        break;
+                    case CharType.CloseBrace:
+                        tokens.Add(new CloseBraceToken(getNextChar().ToString()));
+                        break;
+                    case CharType.VarSeperator:
+                        tokens.Add(new VarSeparatorToken(getNextChar().ToString()));
+                        break;
+                    case CharType.StatementSeperator:
+                        tokens.Add(new StatementSeparatorToken(getNextChar().ToString()));
+                        break;
+                    default:
+                        throw new Exception("The tokenizer found an unidentifiable character.");
+                }
+            }
+
             return tokens.ToArray();
         }
 
@@ -79,7 +120,7 @@ namespace Compiler.Lib
                     return CharType.StatementSeperator;
                 case '\r':
                 case '\n':
-                    return CharType.NewLine;
+                    return CharType.Skip;
             }
 
             switch (char.GetUnicodeCategory(c))
@@ -87,14 +128,14 @@ namespace Compiler.Lib
                 case UnicodeCategory.DecimalDigitNumber:
                     return CharType.Numeric;
                 case UnicodeCategory.LineSeparator:
-                    return CharType.NewLine;
+                    return CharType.Skip;
                 case UnicodeCategory.ParagraphSeparator:
                 case UnicodeCategory.LowercaseLetter:
                 case UnicodeCategory.OtherLetter:
                 case UnicodeCategory.UppercaseLetter:
                     return CharType.Alpha;
                 case UnicodeCategory.SpaceSeparator:
-                    return CharType.Space;
+                    return CharType.Skip;
             }
 
             return CharType.Unknown;

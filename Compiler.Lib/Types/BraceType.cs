@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Compiler.Lib.Types
 {
-    enum BraceType
+    public enum BraceType
     {
         Round,
         Curly

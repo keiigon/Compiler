@@ -1,1 +1,9 @@
 D:\Tarek\Training_Projects\Compiler\Compiler.Console\bin\Debug\Compiler.Console.exe.config
+E:\Learning\Diploma\System-Programming\compiler-project\Compiler\Compiler.Console\bin\Debug\Compiler.Console.exe.config
+E:\Learning\Diploma\System-Programming\compiler-project\Compiler\Compiler.Console\bin\Debug\Compiler.Console.exe
+E:\Learning\Diploma\System-Programming\compiler-project\Compiler\Compiler.Console\bin\Debug\Compiler.Console.pdb
+E:\Learning\Diploma\System-Programming\compiler-project\Compiler\Compiler.Console\obj\Debug\Compiler.Console.exe
+E:\Learning\Diploma\System-Programming\compiler-project\Compiler\Compiler.Console\obj\Debug\Compiler.Console.pdb
+E:\Learning\Diploma\System-Programming\compiler-project\Compiler\Compiler.Console\bin\Debug\Compiler.Lib.dll
+E:\Learning\Diploma\System-Programming\compiler-project\Compiler\Compiler.Console\bin\Debug\Compiler.Lib.pdb
+E:\Learning\Diploma\System-Programming\compiler-project\Compiler\Compiler.Console\obj\Debug\Compiler.Console.csprojResolveAssemblyReference.cache
