@@ -14,6 +14,8 @@ namespace Compiler.Console
         {
             string code = @"begin
                             read(a, b, c);
+                            z = a + b;
+                            d = 5;
                             end";
 
             Scanner sc = new Scanner(code);
