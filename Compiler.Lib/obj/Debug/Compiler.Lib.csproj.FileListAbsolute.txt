@@ -1,0 +1,5 @@
+D:\Tarek\Training_Projects\Compiler\Compiler.Lib\bin\Debug\Compiler.Lib.dll
+D:\Tarek\Training_Projects\Compiler\Compiler.Lib\bin\Debug\Compiler.Lib.pdb
+D:\Tarek\Training_Projects\Compiler\Compiler.Lib\obj\Debug\Compiler.Lib.csprojResolveAssemblyReference.cache
+D:\Tarek\Training_Projects\Compiler\Compiler.Lib\obj\Debug\Compiler.Lib.dll
+D:\Tarek\Training_Projects\Compiler\Compiler.Lib\obj\Debug\Compiler.Lib.pdb
