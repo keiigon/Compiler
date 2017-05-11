@@ -52,7 +52,9 @@
     <Compile Include="Types\OpenBraceToken.cs" />
     <Compile Include="Types\OperatorToken.cs" />
     <Compile Include="Types\OperatorType.cs" />
+    <Compile Include="Types\Statement.cs" />
     <Compile Include="Types\StatementSeparatorToken.cs" />
+    <Compile Include="Types\StatementType.cs" />
     <Compile Include="Types\Token.cs" />
     <Compile Include="Types\VarSeparatorToken.cs" />
   </ItemGroup>

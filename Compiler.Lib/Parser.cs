@@ -11,6 +11,8 @@ namespace Compiler.Lib
     {
         public Token[] _tokens { get; private set; }
 
+        public List<Statement> statements = new List<Statement>();
+
         private int readingPointer;
 
         public Parser(Token[] tokens)
@@ -108,12 +110,15 @@ namespace Compiler.Lib
         private void statement()
         {
             Token token;
+            Token sendToken;
             OperatorToken typeOperator;
             KeywordToken typeKeyword;
             OpenBraceToken typeOpenBrace;
             CloseBraceToken typeCloseBrace;
 
             token = getNextToken();
+
+            sendToken = getCurrentToken();
 
             if (matchToken(typeof(IdentifierToken), token))
             {
@@ -123,7 +128,7 @@ namespace Compiler.Lib
                     typeOperator = (OperatorToken)token;
                     if (typeOperator.OperatorType.Equals(OperatorType.Assignment))
                     {
-                        expression();
+                        expression(sendToken);
                         token = getCurrentToken();
                         if (matchToken(typeof(StatementSeparatorToken), token))
                         {
@@ -143,7 +148,7 @@ namespace Compiler.Lib
                         typeOpenBrace = (OpenBraceToken)token;
                         if (typeOpenBrace.BraceType.Equals(BraceType.Round))
                         {
-                            idList();
+                            idList(KeywordType.Read);
 
                             token = getCurrentToken();
                             if (matchToken(typeof(CloseBraceToken), token))
@@ -169,12 +174,13 @@ namespace Compiler.Lib
                 else if (typeKeyword.KeywordType.Equals(KeywordType.Write))
                 {
                     token = getNextToken();
+
                     if (matchToken(typeof(OpenBraceToken), token))
                     {
                         typeOpenBrace = (OpenBraceToken)token;
                         if (typeOpenBrace.BraceType.Equals(BraceType.Round))
                         {
-                            expressionList();
+                            expressionList(sendToken);
 
                             token = getCurrentToken();
                             if (matchToken(typeof(CloseBraceToken), token))
@@ -196,6 +202,19 @@ namespace Compiler.Lib
                         }
                     }
                 }
+                else if (typeKeyword.KeywordType.Equals(KeywordType.Int))
+                {
+                    idList(KeywordType.Int);
+                    token = getCurrentToken();
+                    if (matchToken(typeof(StatementSeparatorToken), token))
+                    {
+                        return;
+                    }
+                    else
+                    {
+                        //error
+                    }
+                }
                 else
                 {
                     //error
@@ -207,12 +226,12 @@ namespace Compiler.Lib
             }
         }
 
-        private void expression()
+        private void expression(Token t)
         {
             Token token;
             OperatorToken typeOperator;
 
-            primary();
+            primary(t);
 
             token = getNextToken();
 
@@ -221,21 +240,33 @@ namespace Compiler.Lib
                 typeOperator = (OperatorToken)token;
                 if (typeOperator.OperatorType.Equals(OperatorType.Add) || typeOperator.OperatorType.Equals(OperatorType.Substract))
                 {
-                    addOperation();
-                    primary();
+                    addOperation(typeOperator.OperatorType);
+                    primary(null);
                     token = getNextToken();
                 }
             }
         }
 
-        private void idList()
+        private void idList(KeywordType t)
         {
             Token token;
+            Statement st = new Statement();
+
+            if (t.Equals(KeywordType.Int))
+            {
+                st.type = StatementType.DeclarationStatement;
+            }
+            else if (t.Equals(KeywordType.Read))
+            {
+                st.type = StatementType.InputStatement;
+            }
 
             token = getNextToken();
 
             if (matchToken(typeof(IdentifierToken), token))
             {
+                st.tokens.Enqueue(token);
+
                 token = getNextToken();
                 if (matchToken(typeof(VarSeparatorToken), token))
                 {
@@ -244,6 +275,7 @@ namespace Compiler.Lib
                         token = getNextToken();
                         if (matchToken(typeof(IdentifierToken), token))
                         {
+                            st.tokens.Enqueue(token);
                             token = getNextToken();
                         }
                         else
@@ -251,6 +283,8 @@ namespace Compiler.Lib
                             // error
                         }
                     }
+
+                    statements.Add(st);
                 }
                 else
                 {
@@ -260,28 +294,39 @@ namespace Compiler.Lib
             }
         }
 
-        private void expressionList()
+        private void expressionList(Token t)
         {
             Token token;
 
-            expression();
+            expression(t);
 
             token = getCurrentToken();
 
             while (matchToken(typeof(VarSeparatorToken), token))
             {
-                expression();
+                expression(null);
 
                 token = getCurrentToken();
             }
 
         }
 
-        private void primary()
+        private void primary(Token t)
         {
             Token token;
             OpenBraceToken typeOpenBrace;
             CloseBraceToken typeCloseBrace;
+
+            Statement st;
+            
+            if(t == null){
+                st = statements.LastOrDefault();
+            }
+            else
+            {
+                st = new Statement();
+            }
+            
 
             token = getNextToken();
 
@@ -290,7 +335,7 @@ namespace Compiler.Lib
                 typeOpenBrace = (OpenBraceToken)token;
                 if (typeOpenBrace.BraceType.Equals(BraceType.Round))
                 {
-                    expression();
+                    expression(null);
 
                     token = getCurrentToken();
                     if (matchToken(typeof(CloseBraceToken), token))
@@ -313,10 +358,32 @@ namespace Compiler.Lib
             }
             else if (matchToken(typeof(IdentifierToken), token))
             {
+                if (t == null)
+                {
+                    st.tokens.Enqueue(token);
+                }
+                else
+                {
+                    if (t.Content == "write")
+                    {
+                        st.type = StatementType.OutputStatemnt;
+                        st.tokens.Enqueue(token);
+                    }
+                    else
+                    {
+                        st.tokens.Enqueue(t);
+                        st.tokens.Enqueue(token);
+                    }
+                    statements.Add(st);
+                }
                 return;
             }
             else if (matchToken(typeof(NumberLiteralToken), token))
             {
+                st.type = StatementType.AssignmentStatement;
+                st.tokens.Enqueue(t);
+                st.tokens.Enqueue(token);
+                statements.Add(st);
                 return;
             }
             else
@@ -325,9 +392,17 @@ namespace Compiler.Lib
             }
         }
 
-        private void addOperation()
+        private void addOperation(OperatorType t)
         {
-
+            Statement st = statements.LastOrDefault();
+            if (t.Equals(OperatorType.Add))
+            {
+                st.type = StatementType.AddtionStatement;
+            }
+            else if (t.Equals(OperatorType.Substract))
+            {
+                st.type = StatementType.SubtractionStatement;
+            }
         }
 
         private bool matchToken(Type type, Token token)

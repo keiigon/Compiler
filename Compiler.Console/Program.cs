@@ -13,18 +13,26 @@ namespace Compiler.Console
         static void Main(string[] args)
         {
             string code = @"begin
-                            read(a, b, c);
-                            z = a + b;
-                            d = 5;
+                            int a, b, c, z;
+                            c = 5;
+                            read(a, b);
+                            z = a + b + c;
+                            write(z, a);
                             end";
 
             Scanner sc = new Scanner(code);
 
             Token[] tokens = sc.CreateTokens();
 
+            foreach(var t in tokens){
+                System.Console.WriteLine(t);
+            }
+
             Parser ps = new Parser(tokens);
 
             ps.parseTokens();
+
+            System.Console.ReadLine();
         }
     }
 }
