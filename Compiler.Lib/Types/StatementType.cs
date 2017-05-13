@@ -11,8 +11,8 @@ namespace Compiler.Lib.Types
         DeclarationStatement,
         InputStatement,
         OutputStatemnt,
-        AddtionStatement,
-        SubtractionStatement,
-        AssignmentStatement
+        OperationStatement,
+        AssignmentStatement,
+        IfStatement
     }
 }

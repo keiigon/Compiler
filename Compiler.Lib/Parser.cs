@@ -22,11 +22,14 @@ namespace Compiler.Lib
             readingPointer = 0;
         }
 
-        public void parseTokens(){
+        public Statement[] parseTokens()
+        {
             while (!eof())
             {
                 programStart();
             }
+
+            return statements.ToArray();
         }
 
         private void programStart(){
@@ -90,7 +93,7 @@ namespace Compiler.Lib
                 else if (matchToken(typeof(KeywordToken), token))
                 {
                     tokenType = (KeywordToken)token;
-                    if (tokenType.KeywordType.Equals(KeywordType.Read) || tokenType.KeywordType.Equals(KeywordType.Write))
+                    if (tokenType.KeywordType.Equals(KeywordType.Read) || tokenType.KeywordType.Equals(KeywordType.Write) || tokenType.KeywordType.Equals(KeywordType.If))
                     {
                         readingPointer--;
                         statement();
@@ -202,6 +205,33 @@ namespace Compiler.Lib
                         }
                     }
                 }
+                else if (typeKeyword.KeywordType.Equals(KeywordType.If))
+                {
+                    token = getNextToken();
+
+                    if (matchToken(typeof(OpenBraceToken), token))
+                    {
+                        typeOpenBrace = (OpenBraceToken)token;
+                        if (typeOpenBrace.BraceType.Equals(BraceType.Round))
+                        {
+                            expressionList(sendToken);
+
+                            token = getCurrentToken();
+                            if (matchToken(typeof(CloseBraceToken), token))
+                            {
+                                typeCloseBrace = (CloseBraceToken)token;
+                                if (typeCloseBrace.BraceType.Equals(BraceType.Round))
+                                {
+                                    return;
+                                }
+                                else
+                                {
+                                    //error
+                                }
+                            }
+                        }
+                    }
+                }
                 else if (typeKeyword.KeywordType.Equals(KeywordType.Int))
                 {
                     idList(KeywordType.Int);
@@ -240,7 +270,15 @@ namespace Compiler.Lib
                 typeOperator = (OperatorToken)token;
                 if (typeOperator.OperatorType.Equals(OperatorType.Add) || typeOperator.OperatorType.Equals(OperatorType.Substract))
                 {
-                    addOperation(typeOperator.OperatorType);
+                    addOperation(typeOperator);
+                    primary(null);
+                    token = getNextToken();
+                }
+                else if (typeOperator.OperatorType.Equals(OperatorType.Equals) || typeOperator.OperatorType.Equals(OperatorType.NotEquals) ||
+                    typeOperator.OperatorType.Equals(OperatorType.GreaterThan) || typeOperator.OperatorType.Equals(OperatorType.LessThan) ||
+                    typeOperator.OperatorType.Equals(OperatorType.GreaterEquals) || typeOperator.OperatorType.Equals(OperatorType.LessEquals))
+                {
+                    compareOperation(typeOperator);
                     primary(null);
                     token = getNextToken();
                 }
@@ -304,7 +342,7 @@ namespace Compiler.Lib
 
             while (matchToken(typeof(VarSeparatorToken), token))
             {
-                expression(null);
+                expression(t);
 
                 token = getCurrentToken();
             }
@@ -343,15 +381,7 @@ namespace Compiler.Lib
                         typeCloseBrace = (CloseBraceToken)token;
                         if (typeCloseBrace.BraceType.Equals(BraceType.Round))
                         {
-                            token = getNextToken();
-                            if (matchToken(typeof(StatementSeparatorToken), token))
-                            {
-                                return;
-                            }
-                            else
-                            {
-                                //error
-                            }
+                           return;
                         }
                     }
                 }
@@ -369,6 +399,11 @@ namespace Compiler.Lib
                         st.type = StatementType.OutputStatemnt;
                         st.tokens.Enqueue(token);
                     }
+                    else if (t.Content == "if")
+                    {
+                        st.type = StatementType.IfStatement;
+                        st.tokens.Enqueue(token);
+                    }
                     else
                     {
                         st.tokens.Enqueue(t);
@@ -380,10 +415,19 @@ namespace Compiler.Lib
             }
             else if (matchToken(typeof(NumberLiteralToken), token))
             {
-                st.type = StatementType.AssignmentStatement;
-                st.tokens.Enqueue(t);
-                st.tokens.Enqueue(token);
-                statements.Add(st);
+                if (t == null)
+                {
+                    st.tokens.Enqueue(token);
+                }
+                else
+                {
+                    st.type = StatementType.AssignmentStatement;
+
+                    st.tokens.Enqueue(t);
+                    st.tokens.Enqueue(token);
+                    statements.Add(st);
+                }
+                
                 return;
             }
             else
@@ -392,17 +436,20 @@ namespace Compiler.Lib
             }
         }
 
-        private void addOperation(OperatorType t)
+        private void addOperation(Token t)
         {
             Statement st = statements.LastOrDefault();
-            if (t.Equals(OperatorType.Add))
+            st.tokens.Enqueue(t);
+            if (!st.type.Equals(StatementType.OutputStatemnt))
             {
-                st.type = StatementType.AddtionStatement;
+                st.type = StatementType.OperationStatement;
             }
-            else if (t.Equals(OperatorType.Substract))
-            {
-                st.type = StatementType.SubtractionStatement;
-            }
+        }
+
+        private void compareOperation(Token t)
+        {
+            Statement st = statements.LastOrDefault();
+            st.tokens.Enqueue(t);
         }
 
         private bool matchToken(Type type, Token token)

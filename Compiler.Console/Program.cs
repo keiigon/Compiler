@@ -12,12 +12,22 @@ namespace Compiler.Console
     {
         static void Main(string[] args)
         {
+//            string code = @"begin
+//int a, b, c, z;
+//c = 5;
+//read(a, b);
+//z = a + (b - c) + (5 - 4);
+//write(z, a + b);
+//end";
+
+//            string code = @"begin
+//                            write(z, a);
+//                            end";
             string code = @"begin
-                            int a, b, c, z;
-                            c = 5;
-                            read(a, b);
-                            z = a + b + c;
-                            write(z, a);
+                            a = 5;
+                            b = 6;
+                            if(a != b)
+                            b = 55;
                             end";
 
             Scanner sc = new Scanner(code);
@@ -30,7 +40,25 @@ namespace Compiler.Console
 
             Parser ps = new Parser(tokens);
 
-            ps.parseTokens();
+            Statement[] statements = ps.parseTokens();
+
+            System.Console.WriteLine();
+
+            foreach (var s in statements)
+            {
+                System.Console.WriteLine(s);
+            }
+
+            CodeGenerator cg = new CodeGenerator();
+
+            Stack<AssemblyLine> ass = cg.assemble(statements);
+
+            System.Console.WriteLine();
+
+            while (ass.Count > 0)
+            {
+                System.Console.WriteLine(ass.Pop());
+            }
 
             System.Console.ReadLine();
         }

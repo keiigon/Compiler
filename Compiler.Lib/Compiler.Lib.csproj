@@ -39,9 +39,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CodeGenerator.cs" />
     <Compile Include="Parser.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Scanner.cs" />
+    <Compile Include="Types\AssemblyInstructions.cs" />
+    <Compile Include="Types\AssemblyLine.cs" />
     <Compile Include="Types\BraceType.cs" />
     <Compile Include="Types\CharType.cs" />
     <Compile Include="Types\CloseBraceToken.cs" />

@@ -105,6 +105,9 @@ namespace Compiler.Lib
                 case '&':
                 case '|':
                 case '=':
+                case '<':
+                case '>':
+                case '!':
                     return CharType.Operator;
                 case '(':
                 case '[':
